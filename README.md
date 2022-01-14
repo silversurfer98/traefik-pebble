@@ -5,5 +5,6 @@ contains all config for traefik and pebble
 3. run traefik and configure hosts file accordingly
 4. run authelia
 5. then run any services
-
+6. my hosts be like
+192.168.1.10		minimal.home nginx.minimal.home traefik.minimal.home auth.minimal.home
 # ALL WILL BE CERTIFIED EXCEPT PORTAINER BY PEBBLE 

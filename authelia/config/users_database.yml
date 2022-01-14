@@ -10,8 +10,19 @@ users:
   raghav:
     displayname: "raghav"
     # Password is 1998
+    # generate using docker run authelia/authelia:latest authelia hash-password 'yourpassword'
     password: "$argon2id$v=19$m=65536,t=1,p=8$NnB0amFVYy9TeGZvaEZMZA$3t3UeFeFUGacyEaBwtghAk3KCVeOUNzFJoOV6UM0Uhs" 
-    email: omale@omale.com
+    email: hi@hi.com
+    groups:
+      - admins
+      - dev
+    
+    # include username here
+    admin:
+    displayname: "raghav"
+    # Password is 1998
+    password: "$argon2id$v=19$m=65536,t=1,p=8$NnB0amFVYy9TeGZvaEZMZA$3t3UeFeFUGacyEaBwtghAk3KCVeOUNzFJoOV6UM0Uhs" 
+    email: admin@admin.com
     groups:
       - admins
       - dev

@@ -6,17 +6,22 @@ services:
     container_name: traefik
     extra_hosts:
       - "pebble:192.168.1.10"
+      # add this host inside traefik so that caserver can be resolved and the name 
+      # should be pebble, because pebble.minica.pem cert issued for pebble
     command:
       - "--log.level=DEBUG"
       - "--api.insecure=true"
+      # dashboard enabled
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.web.address=:80"
+      # very important
       - "--certificatesresolvers.mypebble.acme.tlschallenge=true"
       - "--certificatesresolvers.mypebble.acme.caserver=https://pebble:14000/dir"
       - "--certificatesresolvers.mypebble.acme.email=omale@omale.com"
       - "--certificatesresolvers.mypebble.acme.storage=/data/acme.json"
+      ###################
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -27,22 +32,27 @@ services:
       - 443:443
       - 8080:8080
     environment:
-      #- LEGO_CA_CERTIFICATES=/home/raghav/pebble/certs/test/certs/localhost/cert.pem
       - LEGO_CA_CERTIFICATES=/root.pem
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /home/raghav/pebble/certs/test/certs/pebble.minica.pem:/root.pem
+      # this is the cert so traefik can trust the pebble server
+
       - /var/run/docker.sock:/var/run/docker.sock:ro
       #- /home/raghav/traefik/data/traefik.yml:/traefik.yml:ro
       - /home/raghav/traefik/data/acme.json:/data/acme.json
+      # always create acme.json as empty and at chmod 600
+
       #- /home/raghav/traefik/data/config.yml:/config.yml:ro
+
     labels:
       - "traefik.enable=true"
       #- "traefik.http.routers.traefik.entrypoints=web"
       #- "traefik.http.routers.traefik.rule=Host(`traefik.minimal.home`)"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=raghav:$$apr1$$hrqyt0Bu$$lnwzPpRWKV6zsAuV8fiKi1"
-# use sudo apt install apache2-utils
-# then echo $(htpasswd -nb <USER> <PASSWORD>) | sed -e s/\\$/\\$\\$/g to get that
+
+      #- "traefik.http.middlewares.traefik-auth.basicauth.users=raghav:$$apr1$$hrqyt0Bu$$lnwzPpRWKV6zsAuV8fiKi1"
+      # use sudo apt install apache2-utils
+      # then echo $(htpasswd -nb <USER> <PASSWORD>) | sed -e s/\\$/\\$\\$/g to get that
 
       #- "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
       #- "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
@@ -54,6 +64,8 @@ services:
       - "traefik.http.routers.traefik-secure.tls.certresolver=mypebble"
       - "traefik.http.routers.traefik-secure.tls.domains[0].main=traefik.minimal.home"
       #- "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.minimal.home"
+      # wildcard certs not working properly with pebble
+
       - "traefik.http.routers.traefik-secure.service=api@internal"
 
 networks:

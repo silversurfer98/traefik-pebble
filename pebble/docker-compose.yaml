@@ -5,17 +5,16 @@ services:
     image: letsencrypt/pebble
     #user: "1000:1000"
     container_name: pebble
-    #restart: unless-stopped
+    restart: unless-stopped
     environment:
         - PEBBLE_VA_NOSLEEP=1
         - PEBBLE_WFE_NONCEREJECT=0
         - PEBBLE_AUTHZREUSE=100
-        - PEBBLE_VA_ALWAYS_VALID=1
+        - PEBBLE_VA_ALWAYS_VALID=1 # dont verify mail id
     networks:
       - proxy
-        #ipv4_address: 172.18.0.5
     ports:
-      - 15000:15000
+      #- 15000:15000
       - 14000:14000
     volumes:
       - /home/raghav/pebble/certs/test:/test
