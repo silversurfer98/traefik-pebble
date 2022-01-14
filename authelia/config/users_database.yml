@@ -1,0 +1,18 @@
+---
+###############################################################
+#                         Users Database                      #
+###############################################################
+
+# This file can be used if you do not have an LDAP set up.
+
+# List of users
+users:
+  raghav:
+    displayname: "raghav"
+    # Password is 1998
+    password: "$argon2id$v=19$m=65536,t=1,p=8$NnB0amFVYy9TeGZvaEZMZA$3t3UeFeFUGacyEaBwtghAk3KCVeOUNzFJoOV6UM0Uhs" 
+    email: omale@omale.com
+    groups:
+      - admins
+      - dev
+...

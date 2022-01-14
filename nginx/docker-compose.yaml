@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nginx.rule=Host(`nginx.minimal.home`)"
+      - "traefik.http.routers.nginx.entrypoints=websecure"
+      #- "traefik.http.middlewares.nginx-auth.basicauth.users=raghav:$$apr1$$hrqyt0Bu$$lnwzPpRWKV6zsAuV8fiKi1"
+      - "traefik.http.routers.nginx.middlewares=authelia@docker"
+      - "traefik.http.routers.nginx.tls=true"
+      - "traefik.http.routers.nginx.tls.certresolver=mypebble"
+      
+
+networks:
+  proxy:
+    external: true

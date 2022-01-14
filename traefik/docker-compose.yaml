@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    extra_hosts:
+      - "pebble:192.168.1.10"
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.address=:80"
+      - "--certificatesresolvers.mypebble.acme.tlschallenge=true"
+      - "--certificatesresolvers.mypebble.acme.caserver=https://pebble:14000/dir"
+      - "--certificatesresolvers.mypebble.acme.email=omale@omale.com"
+      - "--certificatesresolvers.mypebble.acme.storage=/data/acme.json"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    environment:
+      #- LEGO_CA_CERTIFICATES=/home/raghav/pebble/certs/test/certs/localhost/cert.pem
+      - LEGO_CA_CERTIFICATES=/root.pem
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/raghav/pebble/certs/test/certs/pebble.minica.pem:/root.pem
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      #- /home/raghav/traefik/data/traefik.yml:/traefik.yml:ro
+      - /home/raghav/traefik/data/acme.json:/data/acme.json
+      #- /home/raghav/traefik/data/config.yml:/config.yml:ro
+    labels:
+      - "traefik.enable=true"
+      #- "traefik.http.routers.traefik.entrypoints=web"
+      #- "traefik.http.routers.traefik.rule=Host(`traefik.minimal.home`)"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=raghav:$$apr1$$hrqyt0Bu$$lnwzPpRWKV6zsAuV8fiKi1"
+# use sudo apt install apache2-utils
+# then echo $(htpasswd -nb <USER> <PASSWORD>) | sed -e s/\\$/\\$\\$/g to get that
+
+      #- "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      #- "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      #- "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=websecure"
+      - "traefik.http.routers.traefik-secure.rule=Host(`traefik.minimal.home`)"
+      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=mypebble"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=traefik.minimal.home"
+      #- "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.minimal.home"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+
+networks:
+  proxy:
+    external: true
