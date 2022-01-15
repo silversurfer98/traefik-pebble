@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx
+    container_name: nginx-test4proxy
+    restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
